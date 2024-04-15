@@ -38,8 +38,8 @@ async def monitor_active_window():
 
             current_window_title_low = current_window_title.lower()
 
-            browsers = ["opera", "edge", "chrome"]
-            banned = ["facebook", "instagram"]
+            browsers = ["opera", "edge", "chrome"]   #add your browsers
+            banned = ["facebook", "instagram"]       #add the sites
 
             date_and_time = str(datetime.datetime.now())[:-7]
             save_window_data(date_and_time[:-9], date_and_time[10:], current_window_title_low)
