@@ -4,7 +4,6 @@ import os
 import asyncio
 import datetime
 import pygetwindow as gw
-from screeninfo import get_monitors
 import serial 
 
 load_dotenv()
