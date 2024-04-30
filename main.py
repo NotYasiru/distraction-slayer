@@ -98,15 +98,5 @@ def get_active_window_title():
     active_window = gw.getActiveWindow()
     return active_window.title if active_window else None
 
-
-def monitor_contains_window_title(monitor, window_title):
-    for window in gw.getAllWindows():
-        if window.title == window_title:
-            window_center_x = window.left + (window.width / 2)
-            window_center_y = window.top + (window.height / 2)
-            if monitor.x <= window_center_x <= monitor.x + monitor.width and monitor.y <= window_center_y <= monitor.y + monitor.height:
-                return True
-    return False
-
 if __name__ == "__main__":
     asyncio.run(monitor_active_window())
