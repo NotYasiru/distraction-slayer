@@ -4,19 +4,34 @@ import os
 import asyncio
 import datetime
 import pygetwindow as gw
-import serial 
+import pyautogui
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
-arduino = serial.Serial(port='your port', baudrate=9600, timeout=.1) #replace your arduino board's port
 
-def alarm(signal):
-    print("alarm")
-    arduino.write(bytes(signal, 'utf-8'))
+try:
+    import serial
+    try:
+        arduino = serial.Serial(port='', baudrate=9600, timeout=.1)    #replace your arduino board's port
+        arduino_available = True
+    except serial.SerialException as e:
+        print(f"Error opening Arduino port: {e}")
+except ImportError:
+    print("Arduino module not found. Arduino functionality will be disabled.")
+
+
+def alarm(signal, window):
+    if arduino_available:
+        arduino.write(bytes(signal, 'utf-8'))
+    if signal == '2':
+        if window == "web":
+            pyautogui.hotkey('ctrl', 'w')
+        elif window == "soft":
+            pyautogui.hotkey('alt', 'f4')
 
 
 def save_window_data(date, time, window):    
-    directory_path = "window_data"
+    directory_path = "C:\window_data"   #This is where the data about your activities stores. you can change it if you like.
     file_path = os.path.join(directory_path, f"{date}.txt")
     
     try:
@@ -33,12 +48,13 @@ async def monitor_active_window():
         current_window_title = get_active_window_title()
         
         if current_window_title and current_window_title != previous_window_title:
-            alarm("1")
+            alarm("1", "")
 
             current_window_title_low = current_window_title.lower()
 
             browsers = ["opera", "edge", "chrome"]   #add your browsers
-            banned = ["facebook", "instagram"]       #add the sites
+            banned_web = ["facebook", "instagram"]       #add the sites
+            banned_soft = ["minecraft", "spotify"]              #add the softwares
 
             date_and_time = str(datetime.datetime.now())[:-7]
             save_window_data(date_and_time[:-9], date_and_time[10:], current_window_title_low)
@@ -64,11 +80,15 @@ async def monitor_active_window():
 
 
                         if ai_result in ["music", "entertainment"]:
-                            alarm("2")
+                            alarm("2", "web")
                 
-                elif any(word in current_window_title_low for word in banned):
+                elif any(word in current_window_title_low for word in banned_web):
                     #print("banned site")
                     alarm("2")
+
+            elif any(word in current_window_title_low for word in banned_soft):
+                #print("banned software")
+                alarm("2", "soft")
 
             previous_window_title = current_window_title
         
